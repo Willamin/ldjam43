@@ -1,5 +1,15 @@
 # ld43
 
+Theme: **Sacrifices must be made**
+
+### Ideas
+Theme:
+  - collect and sacrifice various farm animals to appease the gods
+  - sacrifice health in order to attain items
+
+Gameplay:
+  - 
+
 ## Contributing
 
 1. Fork it ( https://github.com/willamin/ld43/fork )

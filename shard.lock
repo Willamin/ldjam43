@@ -4,3 +4,11 @@ shards:
     github: ragmaanir/microtest
     commit: 46199a9b32be12021b9018a7e7e068572b842c69
 
+  molly2d:
+    github: willamin/molly2d
+    commit: dca29effe04ca33b99765608202d88aa37e1a12a
+
+  sdl:
+    github: ysbaddaden/sdl.cr
+    commit: 21ae9e3aa7e51727620929761628ca62cff83ad8
+

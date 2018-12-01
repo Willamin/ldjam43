@@ -9,3 +9,4 @@ parser = OptionParser.new do |parser|
 end
 
 parser.parse!
+Molly.run
