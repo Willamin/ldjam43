@@ -18,7 +18,7 @@ end
 
 module Molly
   data started : Bool { false }
-  data hit_points : Int32 { 3 }
+  data player : Player { Player.new(7.tiles, 7.tiles) }
   data drawable_objects : Array(Entity) { [] of Entity }
   data updateable_objects : Array(Entity) { [] of Entity }
 
@@ -26,15 +26,18 @@ module Molly
     window.size = {15.tiles, 15.tiles}
     Molly.background = Color.new(240, 240, 240)
 
-    Player.new(7.tiles, 7.tiles).tap do |p|
-      updateable_objects << p
-      drawable_objects << p
-    end
+    updateable_objects << Molly.player
+    drawable_objects << Molly.player
 
     (0..14).each { |x| drawable_objects << Wall.new(x.tiles, 0.tiles, (6..8).includes?(x)) }
     (0..14).each { |x| drawable_objects << Wall.new(x.tiles, 14.tiles, (6..8).includes?(x)) }
     (1..13).each { |x| drawable_objects << Wall.new(0.tiles, x.tiles, (6..8).includes?(x)) }
     (1..13).each { |x| drawable_objects << Wall.new(14.tiles, x.tiles, (6..8).includes?(x)) }
+
+    Monster.new(9.tiles, 9.tiles).tap do |m|
+      updateable_objects << m
+      drawable_objects << m
+    end
   end
 
   def update(dt)
@@ -59,7 +62,7 @@ module Molly
       drawable_objects.sort_by! { |entity| entity.y }
       drawable_objects.each(&.draw)
       set_color(Color.new(40, 40, 40))
-      draw_text(3.tiles, 3.tiles, "Hit Points: #{Molly.hit_points}")
+      draw_text(3.tiles, 3.tiles, "Hit Points: #{Molly.player.hit_points} / #{Molly.player.hit_points_max}")
     else
       set_color(Color.new(40, 40, 40))
       start_text = "Press [SPACE] to Start"

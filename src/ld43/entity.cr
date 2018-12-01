@@ -10,4 +10,6 @@ abstract class Entity
   def update(dt); end
 
   def draw; end
+
+  def collision(other : Entity); end
 end
