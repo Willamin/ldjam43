@@ -63,24 +63,6 @@ class Player < Entity
     Molly.draw_rect(@x, @y, 1.tiles, 1.tiles)
   end
 
-  def collides_with_anything
-    (Molly.all_objects - [self]).each do |obj|
-      if collides_with(obj)
-        collision(obj)
-        obj.collision(self)
-        return true
-      end
-    end
-    false
-  end
-
-  def collides_with(other)
-    self.x < other.x + other.width &&
-      other.x < self.x + other.width &&
-      self.y < other.y + other.height &&
-      other.y < self.y + other.height
-  end
-
   def collision(m : Monster)
     return if @invincible > 0
     @invincible = 2
