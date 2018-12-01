@@ -17,6 +17,7 @@ struct Int32
 end
 
 module Molly
+  data started : Bool { false }
   data hit_points : Int32 { 3 }
   data drawable_objects : Array(Entity) { [] of Entity }
   data updateable_objects : Array(Entity) { [] of Entity }
@@ -37,17 +38,32 @@ module Molly
   end
 
   def update(dt)
-    updateable_objects.reject! do |entity|
-      entity.update(dt)
-      entity.delete_me
+    if Molly.keyboard_pressed?(Key::SPACE)
+      Molly.started = true
+    end
+
+    if started
+      updateable_objects.reject! do |entity|
+        entity.update(dt)
+        entity.delete_me
+      end
     end
   end
 
   def draw
-    drawable_objects.sort_by! { |entity| entity.y }
-    drawable_objects.each &.draw
-    set_color(Color.new(40, 40, 40))
-    draw_text(3.tiles, 3.tiles, "Hit Points: #{Molly.hit_points}")
+    if started
+      drawable_objects.sort_by! { |entity| entity.y }
+      drawable_objects.each(&.draw)
+      set_color(Color.new(40, 40, 40))
+      draw_text(3.tiles, 3.tiles, "Hit Points: #{Molly.hit_points}")
+    else
+      set_color(Color.new(40, 40, 40))
+      start_text = "Press [SPACE] to Start"
+      w = text_width(start_text)
+      x = 7.tiles + Ld43::TILE_SIZE / 2.0
+      x -= w/2.0
+      draw_text(x.to_i, 6.tiles, start_text)
+    end
   end
 
   def all_objects
