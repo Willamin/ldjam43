@@ -10,6 +10,16 @@ Theme:
 Gameplay:
   - 
 
+## Building and Running
+
+You must install SDL2 before you can build/run this game.
+
+```sh-session
+$ shards update   # update dependencies
+$ shards build    # build the game
+$ bin/ld43        # play the game
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/willamin/ld43/fork )
