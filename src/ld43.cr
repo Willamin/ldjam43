@@ -3,7 +3,7 @@ require "./ld43/*"
 
 module Ld43
   VERSION   = {{ `shards version #{__DIR__}`.chomp.stringify }}
-  TILE_SIZE = 48
+  TILE_SIZE = 24
 end
 
 struct Int32
@@ -23,17 +23,20 @@ module Molly
   data updateable_objects : Array(Entity) { [] of Entity }
 
   def load
-    window.size = {15.tiles, 15.tiles}
+    window.size = {25.tiles, 25.tiles}
     Molly.background = Color.new(240, 240, 240)
 
     Molly.player = Player.new(7.tiles, 7.tiles)
     updateable_objects << Molly.player
     drawable_objects << Molly.player
 
-    (0..14).each { |x| drawable_objects << Wall.new(x.tiles, 0.tiles, (6..8).includes?(x)) }
-    (0..14).each { |x| drawable_objects << Wall.new(x.tiles, 14.tiles, (6..8).includes?(x)) }
-    (1..13).each { |x| drawable_objects << Wall.new(0.tiles, x.tiles, (6..8).includes?(x)) }
-    (1..13).each { |x| drawable_objects << Wall.new(14.tiles, x.tiles, (6..8).includes?(x)) }
+    low = 0
+    high = 24
+    center = (high / 2 - 1)..(high / 2 + 1)
+    (low..high).each { |x| drawable_objects << Wall.new(x.tiles, low.tiles, center.includes?(x)) }
+    (low..high).each { |x| drawable_objects << Wall.new(x.tiles, high.tiles, center.includes?(x)) }
+    ((low + 1)..(high - 1)).each { |x| drawable_objects << Wall.new(low.tiles, x.tiles, center.includes?(x)) }
+    ((low + 1)..(high - 1)).each { |x| drawable_objects << Wall.new(high.tiles, x.tiles, center.includes?(x)) }
 
     Monster.new(9.tiles, 9.tiles).tap do |m|
       updateable_objects << m
