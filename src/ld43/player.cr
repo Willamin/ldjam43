@@ -46,6 +46,13 @@ class Player < Entity
         @y = @previous_y
       end
     end
+
+    if @x != @previous_x && @y != @previous_y
+      prop_x = @x - @previous_x
+      prop_y = @y - @previous_y
+      @x = (@previous_x + prop_x * 0.707).to_i
+      @y = (@previous_y + prop_y * 0.707).to_i
+    end
   end
 
   def draw

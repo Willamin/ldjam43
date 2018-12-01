@@ -26,7 +26,7 @@ module Molly
     window.size = {25.tiles, 25.tiles}
     Molly.background = Color.new(240, 240, 240)
 
-    Molly.player = Player.new(7.tiles, 7.tiles)
+    Molly.player = Player.new(12.tiles, 12.tiles)
     updateable_objects << Molly.player
     drawable_objects << Molly.player
 
