@@ -42,6 +42,10 @@ module Molly
       Molly.started = true
     end
 
+    if Molly.keyboard_pressed?(Key::ESCAPE)
+      exit(0)
+    end
+
     if started
       updateable_objects.reject! do |entity|
         entity.update(dt)
