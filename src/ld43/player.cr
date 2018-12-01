@@ -1,14 +1,16 @@
 class Player < Entity
   @previous_x : Int32
   @previous_y : Int32
-  getter hit_points = 3
-  getter hit_points_max = 3
+  getter hit_points : Int32
+  getter hit_points_max : Int32
   property speed = 300
   @invincible : Float64 = 0
 
   def initialize(@x, @y)
     @previous_x = @x
     @previous_y = @y
+    @hit_points = 3
+    @hit_points_max = 3
   end
 
   def update(dt)

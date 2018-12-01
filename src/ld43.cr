@@ -26,6 +26,7 @@ module Molly
     window.size = {15.tiles, 15.tiles}
     Molly.background = Color.new(240, 240, 240)
 
+    Molly.player = Player.new(7.tiles, 7.tiles)
     updateable_objects << Molly.player
     drawable_objects << Molly.player
 
@@ -54,6 +55,10 @@ module Molly
         entity.update(dt)
         entity.delete_me
       end
+    end
+
+    if Molly.player.hit_points <= 0
+      exit(0)
     end
   end
 
