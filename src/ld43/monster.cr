@@ -1,3 +1,5 @@
+require "./entity"
+
 abstract class Monster < Entity
   @previous_x : Int32
   @previous_y : Int32

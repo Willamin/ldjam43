@@ -1,3 +1,5 @@
+require "../monster"
+
 class Follow < Monster
   SPRITE = "res/spider.png"
   @countdown : Float64 = 1

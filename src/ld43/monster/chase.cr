@@ -1,3 +1,5 @@
+require "../monster"
+
 class Chase < Monster
   SPRITE = "res/bat.png"
   @mode = :wandering

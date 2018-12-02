@@ -115,4 +115,8 @@ class Player < Entity
   def collides_with(b : Bullet)
     false
   end
+
+  def all_objects
+    super + Molly.player_cant_cross
+  end
 end

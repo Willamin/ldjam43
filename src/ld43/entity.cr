@@ -11,8 +11,12 @@ abstract class Entity
 
   def draw; end
 
+  def all_objects
+    Molly.all_objects
+  end
+
   def collides_with_anything
-    (Molly.all_objects - [self]).each do |obj|
+    (self.all_objects - [self]).each do |obj|
       if collides_with(obj)
         collision(obj)
         obj.collision(self)

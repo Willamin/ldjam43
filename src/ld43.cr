@@ -1,4 +1,5 @@
 require "molly2d"
+require "./ld43/waves"
 require "./ld43/entity"
 require "./ld43/*"
 
@@ -23,23 +24,28 @@ module Molly
   data player : Player | Tombstone { Player.new(7.tiles, 7.tiles) }
   data drawable_objects : Array(Entity) { [] of Entity }
   data updateable_objects : Array(Entity) { [] of Entity }
+  data player_cant_cross : Array(Entity) { [] of Entity }
   data grasses : Array(Tuple(Int32, Int32)) { [] of Tuple(Int32, Int32) }
+  data current_wave : Int32 { 0 }
+  data wave_queue : Array(Monster.class) { [] of Monster.class }
 
   def game_setup
     Molly.updateable_objects = [] of Entity
     Molly.drawable_objects = [] of Entity
+    Molly.player_cant_cross = [] of Entity
     Molly.start_pressed = false
     Molly.started = false
+    Molly.current_wave = 0
     generate_grasses
     Molly.player = Player.new(7.tiles, 7.tiles)
     create_walls
-    [Dumb.new(9.tiles, 9.tiles),
-     Follow.new(1.tiles, 1.tiles),
-     Chase.new(11.tiles, 2.tiles),
-    ].each &.tap do |m|
-      updateable_objects << m
-      drawable_objects << m
-    end
+    # [Dumb.new(9.tiles, 9.tiles),
+    #  Follow.new(1.tiles, 1.tiles),
+    #  Chase.new(11.tiles, 2.tiles),
+    # ].each &.tap do |m|
+    #   updateable_objects << m
+    #   drawable_objects << m
+    # end
   end
 
   def load
@@ -71,6 +77,23 @@ module Molly
         entity.update(dt)
         entity.delete_me
       end
+
+      number_of_monsters = Molly.updateable_objects.select(&.is_a?(Monster)).size
+      if number_of_monsters == 0 && Molly.wave_queue.size == 0
+        Molly.current_wave += 1
+        wave = WAVES[Molly.current_wave]?
+        if wave.nil?
+          puts("You've cleared all the waves!")
+          exit(0)
+        end
+        wave.monsters.each do |monster|
+          Molly.wave_queue << monster
+        end
+      end
+
+      while number_of_monsters < WAVES[Molly.current_wave].max_on_screen && !Molly.wave_queue.empty?
+        spawn_monster(Molly.wave_queue.pop)
+      end
     end
 
     player = Molly.player
@@ -81,6 +104,18 @@ module Molly
         Molly.play_sound(Molly.load_sound("res/die.wav"))
         Molly.player = Tombstone.new(x, y)
       end
+    end
+  end
+
+  def spawn_monster(m : Monster.class)
+    side = [:top, :bottom, :leftside, :rightside].shuffle.first
+    monster =
+      case side
+      when :top then m.new(7.tiles, -1.tiles)
+      end
+    monster.try do |monster|
+      Molly.updateable_objects << monster
+      Molly.drawable_objects << monster
     end
   end
 
@@ -100,12 +135,12 @@ module Molly
       drawable_objects.each(&.draw)
       player = Molly.player
       if player.is_a?(Player)
-        hp_text = "Hit Points: #{player.hit_points} / #{player.hit_points_max}"
+        hp_text = "Current Wave: #{Molly.current_wave}\nHit Points: #{player.hit_points} / #{player.hit_points_max}"
       else
         hp_text = "You have died. Press [SPACE] to Restart"
       end
       set_color(Color.new(200, 200, 200))
-      draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text) + 8, 24)
+      draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text) + 8, 48)
       set_color(Color.new(40, 40, 40))
       draw_text(3.tiles, 3.tiles, hp_text)
     else
@@ -128,7 +163,7 @@ module Molly
     # top
     drawable_objects << Wall.new(0.tiles, 0.tiles, Wall::ROOF_TEE)
     5.times { |x| drawable_objects << Wall.new((1 + x).tiles, 0.tiles, Wall::SIDE) }
-    3.times { |x| drawable_objects << Wall.new((6 + x).tiles, 0.tiles, Wall::INVIS) }
+    3.times { |x| player_cant_cross << Wall.new((6 + x).tiles, 0.tiles, Wall::INVIS) }
     5.times { |x| drawable_objects << Wall.new((9 + x).tiles, 0.tiles, Wall::SIDE) }
     drawable_objects << Wall.new(14.tiles, 0.tiles, Wall::ROOF_TEE)
 
@@ -136,15 +171,43 @@ module Molly
     [0, 14].each do |x|
       4.times { |y| drawable_objects << Wall.new(x.tiles, (1 + y).tiles, Wall::ROOF) }
       drawable_objects << Wall.new(x.tiles, 5.tiles, Wall::SIDE_TEE)
-      3.times { |y| drawable_objects << Wall.new(x.tiles, (6 + y).tiles, Wall::INVIS) }
+      3.times { |y| player_cant_cross << Wall.new(x.tiles, (6 + y).tiles, Wall::INVIS) }
       5.times { |y| drawable_objects << Wall.new(x.tiles, (9 + y).tiles, Wall::ROOF) }
       drawable_objects << Wall.new(x.tiles, 14.tiles, Wall::SIDE_TEE)
     end
 
     # bottom
     5.times { |x| drawable_objects << Wall.new((1 + x).tiles, 14.tiles, Wall::SIDE) }
-    3.times { |x| drawable_objects << Wall.new((6 + x).tiles, 14.tiles, Wall::INVIS) }
+    3.times { |x| player_cant_cross << Wall.new((6 + x).tiles, 14.tiles, Wall::INVIS) }
     5.times { |x| drawable_objects << Wall.new((9 + x).tiles, 14.tiles, Wall::SIDE) }
+
+    # boxes
+    [{5, -1},
+     {6, -2},
+     {7, -2},
+     {8, -2},
+     {9, -1},
+
+     {5, 15},
+     {6, 16},
+     {7, 16},
+     {8, 16},
+     {9, 15},
+
+     {-1, 5},
+     {-2, 6},
+     {-2, 7},
+     {-2, 8},
+     {-1, 9},
+
+     {15, 5},
+     {16, 6},
+     {16, 7},
+     {16, 8},
+     {15, 9},
+    ].each do |x, y|
+      drawable_objects << Wall.new(x.tiles, y.tiles, Wall::INVIS)
+    end
   end
 
   def generate_grasses
