@@ -1,8 +1,8 @@
 require "../monster"
 
-class Chase < Monster
-  SPRITE = "res/bat.png"
-  @mode = :wandering
+class Wander < Monster
+  SPRITE = "res/slime.png"
+  @mode = :chasing
 
   def initialize(@x, @y)
     super
@@ -15,7 +15,7 @@ class Chase < Monster
     wander(dt) if @mode == :wandering
 
     distance_to_player = Math.sqrt((Molly.player.x - @x)**2 + (Molly.player.y - @y)**2)
-    if distance_to_player < 5.tiles && Molly.player.is_a?(Player) || @x < 1.tiles || @x > 13.tiles || @y < 1.tiles || @y > 13.tiles
+    if distance_to_player > 4.tiles && Molly.player.is_a?(Player)
       @mode = :chasing
     else
       @mode = :wandering
@@ -37,12 +37,12 @@ class Chase < Monster
     speed_y = target_y - @y
     factor = Math.sqrt(speed_x**2 + speed_y**2)
     unless factor == 0
-      @x += (speed_x * (200 / factor) * dt).to_i
+      @x += (speed_x * (100 / factor) * dt).to_i
       @x = @previous_x if collides_with_anything
     end
 
     unless factor == 0
-      @y += (speed_y * (200 / factor) * dt).to_i
+      @y += (speed_y * (100 / factor) * dt).to_i
       @y = @previous_y if collides_with_anything
     end
 

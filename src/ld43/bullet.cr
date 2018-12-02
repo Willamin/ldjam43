@@ -1,5 +1,7 @@
 class Bullet < Entity
   def initialize(@x, @y, @direction : String)
+    height = 1.tiles / 4
+    width = 1.tiles / 4
   end
 
   def update(dt)

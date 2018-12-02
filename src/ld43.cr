@@ -28,6 +28,7 @@ module Molly
   data grasses : Array(Tuple(Int32, Int32)) { [] of Tuple(Int32, Int32) }
   data current_wave : Int32 { 0 }
   data wave_queue : Array(Monster.class) { [] of Monster.class }
+  data spawn_timer : Float64 { 0_f64 }
 
   def game_setup
     Molly.updateable_objects = [] of Entity
@@ -54,7 +55,7 @@ module Molly
     game_setup
   end
 
-  def update(dt)
+  def handle_global_keys(dt)
     if Molly.keyboard_pressed?(Key::SPACE)
       if Molly.player.is_a?(Tombstone)
         game_setup
@@ -70,32 +71,9 @@ module Molly
     if Molly.keyboard_pressed?(Key::ESCAPE)
       exit(0)
     end
+  end
 
-    if started
-      Molly.player.update(dt)
-      Molly.updateable_objects.reject! do |entity|
-        entity.update(dt)
-        entity.delete_me
-      end
-
-      number_of_monsters = Molly.updateable_objects.select(&.is_a?(Monster)).size
-      if number_of_monsters == 0 && Molly.wave_queue.size == 0
-        Molly.current_wave += 1
-        wave = WAVES[Molly.current_wave]?
-        if wave.nil?
-          puts("You've cleared all the waves!")
-          exit(0)
-        end
-        wave.monsters.each do |monster|
-          Molly.wave_queue << monster
-        end
-      end
-
-      while number_of_monsters < WAVES[Molly.current_wave].max_on_screen && !Molly.wave_queue.empty?
-        spawn_monster(Molly.wave_queue.pop)
-      end
-    end
-
+  def handle_player_death(dt)
     player = Molly.player
     if player.is_a?(Player)
       if player.hit_points <= 0
@@ -107,11 +85,52 @@ module Molly
     end
   end
 
+  def update(dt)
+    handle_global_keys(dt)
+
+    if started
+      Molly.spawn_timer -= dt
+      Molly.player.update(dt)
+      Molly.updateable_objects.reject! do |entity|
+        entity.update(dt)
+        entity.delete_me
+      end
+
+      if number_of_monsters == 0 && Molly.wave_queue.size == 0
+        Molly.current_wave += 1
+        Molly.spawn_timer = 2_f64
+        wave = WAVES[Molly.current_wave]?
+        if wave.nil?
+          puts("You've cleared all the waves!")
+          exit(0)
+        end
+        wave.monsters.each do |monster|
+          Molly.wave_queue << monster
+        end
+      end
+
+      if !Molly.wave_queue.empty? && Molly.spawn_timer <= 0
+        spawn_monster(Molly.wave_queue.pop)
+        spawn_delay = WAVES[Molly.current_wave]?.try(&.spawn_delay_base) || 1_f64
+        Molly.spawn_timer = spawn_delay + (1..10).to_a.shuffle.first * 0.1
+      end
+    end
+
+    handle_player_death(dt)
+  end
+
+  def number_of_monsters
+    Molly.updateable_objects.select(&.is_a?(Monster)).size
+  end
+
   def spawn_monster(m : Monster.class)
     side = [:top, :bottom, :leftside, :rightside].shuffle.first
     monster =
       case side
-      when :top then m.new(7.tiles, -1.tiles)
+      when :top       then m.new(7.tiles, -1.tiles)
+      when :bottom    then m.new(7.tiles, 15.tiles)
+      when :leftside  then m.new(-1.tiles, 7.tiles)
+      when :rightside then m.new(15.tiles, 7.tiles)
       end
     monster.try do |monster|
       Molly.updateable_objects << monster
@@ -153,6 +172,8 @@ module Molly
       set_color(Color.new(40, 40, 40))
       draw_text(x.to_i, 6.tiles, start_text)
     end
+
+    Molly.draw_text(4.tiles, 8.tiles, "to kill: #{number_of_monsters}")
   end
 
   def all_objects
