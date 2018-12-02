@@ -6,6 +6,8 @@ abstract class Monster < Entity
     @previous_x = @x
     @previous_y = @y
   end
+
+  def collides_with(other : Monster); end
 end
 
 require "./monster/*"

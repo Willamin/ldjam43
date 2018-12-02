@@ -38,6 +38,7 @@ module Molly
     [
       Dumb.new(9.tiles, 9.tiles),
       Follow.new(1.tiles, 1.tiles),
+      Chase.new(11.tiles, 2.tiles),
     ].each &.tap do |m|
       updateable_objects << m
       drawable_objects << m
