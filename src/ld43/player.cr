@@ -74,12 +74,17 @@ class Player < Entity
     end
   end
 
+  @bullet_cooldown : Float64 = 0
+
   def shooting_stuff(dt)
-    if Molly.keyboard_pressed?(Key::SPACE)
+    if Molly.keyboard_pressed?(Key::SPACE) && @bullet_cooldown <= 0
       b = Bullet.new(@x + 1.tiles / 2, @y + 1.tiles / 2, @facing)
       Molly.updateable_objects << b
       Molly.drawable_objects << b
+      @bullet_cooldown = 1
     end
+
+    @bullet_cooldown -= dt
   end
 
   def invicibility_stuff(dt)
