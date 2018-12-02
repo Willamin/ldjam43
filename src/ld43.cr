@@ -85,8 +85,8 @@ module Molly
   end
 
   def draw
-    (0..15).each do |x|
-      (0..15).each do |y|
+    (0..14).each do |x|
+      (0..14).each do |y|
         grass_sprite = Molly.load_sprite("res/grass.png")
         grass_sprite = Molly.load_sprite("res/grass-weeds.png") if grasses.includes?({x, y})
         Molly.draw_sprite(x.tiles, y.tiles, grass_sprite, stretch_x: 3, stretch_y: 3)
