@@ -1,4 +1,5 @@
 require "molly2d"
+require "./ld43/entity"
 require "./ld43/*"
 
 module Ld43
@@ -17,6 +18,7 @@ struct Int32
 end
 
 module Molly
+  data start_pressed : Bool { false }
   data started : Bool { false }
   data player : Player | Tombstone { Player.new(7.tiles, 7.tiles) }
   data drawable_objects : Array(Entity) { [] of Entity }
@@ -26,6 +28,7 @@ module Molly
   def game_setup
     Molly.updateable_objects = [] of Entity
     Molly.drawable_objects = [] of Entity
+    Molly.start_pressed = false
     Molly.started = false
     generate_grasses
     Molly.player = Player.new(7.tiles, 7.tiles)
@@ -50,6 +53,11 @@ module Molly
       if Molly.player.is_a?(Tombstone)
         game_setup
       end
+
+      Molly.start_pressed = true
+    end
+
+    if Molly.start_pressed && !Molly.keyboard_pressed?(Key::SPACE)
       Molly.started = true
     end
 
@@ -59,7 +67,7 @@ module Molly
 
     if started
       Molly.player.update(dt)
-      updateable_objects.reject! do |entity|
+      Molly.updateable_objects.reject! do |entity|
         entity.update(dt)
         entity.delete_me
       end
@@ -87,6 +95,7 @@ module Molly
 
     if started
       Molly.player.draw
+      Molly.drawable_objects.reject!(&.delete_me)
       drawable_objects.sort_by! { |entity| entity.y }
       drawable_objects.each(&.draw)
       player = Molly.player

@@ -13,7 +13,7 @@ class Chase < Monster
     wander(dt) if @mode == :wandering
 
     distance_to_player = Math.sqrt((Molly.player.x - @x)**2 + (Molly.player.y - @y)**2)
-    if distance_to_player < 5.tiles
+    if distance_to_player < 5.tiles && Molly.player.is_a?(Player)
       @mode = :chasing
     else
       @mode = :wandering

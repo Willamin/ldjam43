@@ -32,6 +32,7 @@ class Follow < Monster
   end
 
   def move(dt)
+    return unless Molly.player.is_a?(Player)
     target_x = Molly.player.x
     target_y = Molly.player.y
 

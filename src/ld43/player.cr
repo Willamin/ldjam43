@@ -21,8 +21,12 @@ class Player < Entity
   end
 
   def update(dt)
-    @invincible -= dt
-    @invincible = 0 if @invincible <= 0
+    invicibility_stuff(dt)
+    movement_stuff(dt)
+    shooting_stuff(dt)
+  end
+
+  def movement_stuff(dt)
     @previous_x = @x
     @previous_y = @y
 
@@ -68,9 +72,24 @@ class Player < Entity
       @x = (@previous_x + prop_x * 0.707).to_i
       @y = (@previous_y + prop_y * 0.707).to_i
     end
+  end
 
-    if @invincible > 0 && @blink_timer <= 0
-      @blink_timer = 10
+  def shooting_stuff(dt)
+    if Molly.keyboard_pressed?(Key::SPACE)
+      b = Bullet.new(@x + 1.tiles / 2, @y + 1.tiles / 2, @facing)
+      Molly.updateable_objects << b
+      Molly.drawable_objects << b
+    end
+  end
+
+  def invicibility_stuff(dt)
+    @invincible -= dt
+    if @invincible <= 0
+      @invincible = 0
+    else
+      if @blink_timer <= 0
+        @blink_timer = 10
+      end
     end
     @blink_timer -= 1
   end
@@ -85,5 +104,9 @@ class Player < Entity
     Molly.play_sound(Molly.load_sound(HIT_SOUND))
     @invincible = 2
     @hit_points -= 1
+  end
+
+  def collides_with(b : Bullet)
+    false
   end
 end
