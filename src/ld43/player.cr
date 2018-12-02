@@ -78,6 +78,7 @@ class Player < Entity
 
   def shooting_stuff(dt)
     if Molly.keyboard_pressed?(Key::SPACE) && @bullet_cooldown <= 0
+      Molly.play_sound(Molly.load_sound("res/shoot.wav"))
       b = Bullet.new(@x + 1.tiles / 2, @y + 1.tiles / 2, @facing)
       Molly.updateable_objects << b
       Molly.drawable_objects << b

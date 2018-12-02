@@ -14,7 +14,7 @@ class Bullet < Entity
 
   def collision(m : Monster)
     m.delete_me = true
-    delete_me = true
+    self.delete_me = true
     Molly.play_sound(Molly.load_sound("res/kill.wav"))
   end
 
