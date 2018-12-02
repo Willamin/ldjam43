@@ -1,11 +1,16 @@
 class Wall < Entity
-  property invisible : Bool = false
+  ROOF     = "res/wall-roof.png"
+  ROOF_TEE = "res/wall-roof-tee.png"
+  SIDE     = "res/wall-side.png"
+  SIDE_TEE = "res/wall-side-tee.png"
+  INVIS    = ""
+  @sprite : String
 
-  def initialize(@x, @y, @invisible); end
+  def initialize(@x, @y, @sprite = SIDE); end
 
   def draw
-    return if invisible
-    Molly.set_color(Color.new(100, 100, 100))
-    Molly.draw_rect(@x, @y, 1.tiles, 1.tiles)
+    return if @sprite == INVIS
+
+    Molly.draw_sprite(@x, @y, Molly.load_sprite(@sprite), stretch_x: 3, stretch_y: 3)
   end
 end
