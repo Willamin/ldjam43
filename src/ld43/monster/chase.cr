@@ -23,8 +23,8 @@ class Chase < Monster
   def draw
     Molly.draw_sprite(@x, @y, Molly.load_sprite(SPRITE), stretch_x: 3, stretch_y: 3)
 
-    Molly.set_color(Color.new(0, 0, 0))
-    Molly.draw_text(3.tiles, 8.tiles, "mode: #{@mode}\ndir: #{@wander_direction}\ndist: #{@wandered_distance}")
+    # Molly.set_color(Color.new(0, 0, 0))
+    # Molly.draw_text(3.tiles, 8.tiles, "mode: #{@mode}\ndir: #{@wander_direction}\ndist: #{@wandered_distance}")
   end
 
   def chase(dt)

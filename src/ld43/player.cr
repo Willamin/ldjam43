@@ -1,8 +1,9 @@
 class Player < Entity
-  LEFT  = "res/man-left.png"
-  RIGHT = "res/man-right.png"
-  UP    = "res/man-up.png"
-  DOWN  = "res/man-down.png"
+  LEFT      = "res/man-left.png"
+  RIGHT     = "res/man-right.png"
+  UP        = "res/man-up.png"
+  DOWN      = "res/man-down.png"
+  HIT_SOUND = "res/hit.wav"
   @previous_x : Int32
   @previous_y : Int32
   getter hit_points : Int32
@@ -81,6 +82,7 @@ class Player < Entity
 
   def collision(m : Monster)
     return if @invincible > 0
+    Molly.play_sound(Molly.load_sound(HIT_SOUND))
     @invincible = 2
     @hit_points -= 1
   end

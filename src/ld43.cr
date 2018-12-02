@@ -18,35 +18,38 @@ end
 
 module Molly
   data started : Bool { false }
-  data player : Player { Player.new(7.tiles, 7.tiles) }
+  data player : Player | Tombstone { Player.new(7.tiles, 7.tiles) }
   data drawable_objects : Array(Entity) { [] of Entity }
   data updateable_objects : Array(Entity) { [] of Entity }
   data grasses : Array(Tuple(Int32, Int32)) { [] of Tuple(Int32, Int32) }
 
-  def load
-    window.size = {15.tiles, 15.tiles}
-    Molly.background = Color.new(62, 41, 52)
-
+  def game_setup
+    Molly.updateable_objects = [] of Entity
+    Molly.drawable_objects = [] of Entity
+    Molly.started = false
     generate_grasses
-
     Molly.player = Player.new(7.tiles, 7.tiles)
-    updateable_objects << Molly.player
-    drawable_objects << Molly.player
-
     create_walls
-
-    [
-      Dumb.new(9.tiles, 9.tiles),
-      Follow.new(1.tiles, 1.tiles),
-      Chase.new(11.tiles, 2.tiles),
+    [Dumb.new(9.tiles, 9.tiles),
+     Follow.new(1.tiles, 1.tiles),
+     Chase.new(11.tiles, 2.tiles),
     ].each &.tap do |m|
       updateable_objects << m
       drawable_objects << m
     end
   end
 
+  def load
+    window.size = {15.tiles, 15.tiles}
+    Molly.background = Color.new(62, 41, 52)
+    game_setup
+  end
+
   def update(dt)
     if Molly.keyboard_pressed?(Key::SPACE)
+      if Molly.player.is_a?(Tombstone)
+        game_setup
+      end
       Molly.started = true
     end
 
@@ -55,14 +58,21 @@ module Molly
     end
 
     if started
+      Molly.player.update(dt)
       updateable_objects.reject! do |entity|
         entity.update(dt)
         entity.delete_me
       end
     end
 
-    if Molly.player.hit_points <= 0
-      exit(0)
+    player = Molly.player
+    if player.is_a?(Player)
+      if player.hit_points <= 0
+        x = player.x
+        y = player.y
+        Molly.play_sound(Molly.load_sound("res/die.wav"))
+        Molly.player = Tombstone.new(x, y)
+      end
     end
   end
 
@@ -76,9 +86,15 @@ module Molly
     end
 
     if started
+      Molly.player.draw
       drawable_objects.sort_by! { |entity| entity.y }
       drawable_objects.each(&.draw)
-      hp_text = "Hit Points: #{Molly.player.hit_points} / #{Molly.player.hit_points_max}"
+      player = Molly.player
+      if player.is_a?(Player)
+        hp_text = "Hit Points: #{player.hit_points} / #{player.hit_points_max}"
+      else
+        hp_text = "You have died. Press [SPACE] to Restart"
+      end
       set_color(Color.new(200, 200, 200))
       draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text) + 8, 24)
       set_color(Color.new(40, 40, 40))
@@ -96,7 +112,7 @@ module Molly
   end
 
   def all_objects
-    Molly.updateable_objects | Molly.drawable_objects
+    Molly.updateable_objects | Molly.drawable_objects | [Molly.player]
   end
 
   def create_walls
@@ -123,6 +139,7 @@ module Molly
   end
 
   def generate_grasses
+    Molly.grasses = [] of Tuple(Int32, Int32)
     8.times do
       grasses << {1 + Random.rand(14), 1 + Random.rand(14)}
     end
