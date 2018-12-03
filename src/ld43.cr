@@ -160,18 +160,18 @@ module Molly
         hp_text = "You have died. Press [SPACE] to Restart"
       end
       set_color(Color.new(200, 200, 200))
-      draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text) + 8, 48)
+      draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text, Ld43::FONT) + 8, 48)
       set_color(Color.new(40, 40, 40))
       draw_text(3.tiles, 3.tiles, hp_text, Ld43::FONT)
     else
       start_text = "Press [SPACE] to Start"
-      w = text_width(start_text)
+      w = text_width(start_text, Ld43::FONT)
       x = 7.tiles + Ld43::TILE_SIZE / 2.0
       x -= w / 2.0
       set_color(Color.new(200, 200, 200))
-      draw_rect(x.to_i - 4, 6.tiles - 2, text_width(start_text) + 8, 24)
+      draw_rect(x.to_i - 4, 6.tiles - 2, text_width(start_text, Ld43::FONT) + 8, 24)
       set_color(Color.new(40, 40, 40))
-      draw_text(x.to_i, 6.tiles, start_text)
+      draw_text(x.to_i, 6.tiles, start_text, Ld43::FONT)
     end
 
     # Molly.draw_text(4.tiles, 8.tiles, "to kill: #{number_of_monsters}")

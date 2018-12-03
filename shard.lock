@@ -6,7 +6,7 @@ shards:
 
   molly2d:
     github: willamin/molly2d
-    commit: 81d7b32df462b50e1f044e9427ca9616067ce69d
+    commit: 2e2064d366c227555a814b8068f565187ef9df7d
 
   sdl:
     github: ysbaddaden/sdl.cr
