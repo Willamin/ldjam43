@@ -173,7 +173,7 @@ module Molly
       draw_text(x.to_i, 6.tiles, start_text)
     end
 
-    Molly.draw_text(4.tiles, 8.tiles, "to kill: #{number_of_monsters}")
+    # Molly.draw_text(4.tiles, 8.tiles, "to kill: #{number_of_monsters}")
   end
 
   def all_objects
