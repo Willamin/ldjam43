@@ -6,6 +6,7 @@ require "./ld43/*"
 module Ld43
   VERSION   = {{ `shards version #{__DIR__}`.chomp.stringify }}
   TILE_SIZE = 48
+  FONT      = SDL::TTF::Font.new("res/Monaco.dfont", 16)
 end
 
 struct Int32
@@ -161,7 +162,7 @@ module Molly
       set_color(Color.new(200, 200, 200))
       draw_rect(3.tiles - 4, 3.tiles - 2, text_width(hp_text) + 8, 48)
       set_color(Color.new(40, 40, 40))
-      draw_text(3.tiles, 3.tiles, hp_text)
+      draw_text(3.tiles, 3.tiles, hp_text, Ld43::FONT)
     else
       start_text = "Press [SPACE] to Start"
       w = text_width(start_text)
